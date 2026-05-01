@@ -1,0 +1,29 @@
+{
+    "name": "Cloud Desktop (NoVNC)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "codespaces": {
+            "openFiles": []
+        },
+        "vscode": {
+            "extensions": []
+        }
+    },
+    // Code 2: Configure VNC
+    "onCreateCommand": "mkdir -p ~/.vnc && echo '#!/bin/sh\nunset SESSION_MANAGER\nunset DBUS_SESSION_BUS_ADDRESS\neval $(dbus-launch --sh-syntax --exit-with-session)\nexport XDG_CURRENT_DESKTOP=XFCE\nexport LIBGL_ALWAYS_SOFTWARE=1\nexport DISPLAY=:1\nstartxfce4 &' > ~/.vnc/xstartup && chmod +x ~/.vnc/xstartup",
+    
+    // Code 3: Start Server
+    "postStartCommand": "vncserver -kill :1 || true && vncserver :1 -geometry 1280x800 -depth 24 && websockify --web /usr/share/novnc/ 6080 localhost:5901",
+
+    // Automatically expose and open the port in the browser
+    "forwardPorts": [6080],
+    "portsAttributes": {
+        "6080": {
+            "label": "Desktop Interface",
+            "onAutoForward": "openBrowser"
+        }
+    },
+    "remoteUser": "vscode"
+}
